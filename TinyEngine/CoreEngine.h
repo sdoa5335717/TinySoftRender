@@ -24,12 +24,21 @@ public:
 		if (!pObj) {
 			return;
 		}
-		// 模型坐标到世界坐标
-		//Model_To_World_OBJECT4DV1(pObj);
-		//TransformToWorld(pObj);
-		TransformToScreen(pObj);
-		// 
-		DrawPrimitive(pObj, TNY_TRANGLELIST);
+		for (auto i=0;i<pObj->num_polys;i++)
+		{
+			if (!(pObj->plist[i].state & POLY4DV1_STATE_ACTIVE)||
+				(pObj->plist[i].state & POLY4DV1_STATE_BACKFACE)/* ||
+				(pObj->plist[i].state & POLY4DV1_STATE_CLIPPED) ||
+				(pObj->plist[i].state & POLY4DV1_ATTR_2SIDE) ||
+				(pObj->plist[i].state & POLY4DV1_STATE_BACKFACE)*/)
+			{
+				continue;
+			}
+			m_draw.Trangle(UTILS::Vertex((int)pObj->vlist_trans[pObj->plist[i].vert[0]].x, (int)pObj->vlist_trans[pObj->plist[i].vert[0]].y, pObj->plist[i].color),
+				UTILS::Vertex((int)pObj->vlist_trans[pObj->plist[i].vert[1]].x, (int)pObj->vlist_trans[pObj->plist[i].vert[1]].y, pObj->plist[i].color),
+				UTILS::Vertex((int)pObj->vlist_trans[pObj->plist[i].vert[2]].x, (int)pObj->vlist_trans[pObj->plist[i].vert[2]].y, pObj->plist[i].color),
+				m_buffer);
+		}
 		//pObj->
 	}
 	void SetTransform(int type, const TNYMATH::MATRIX4X4& matx)
@@ -53,6 +62,8 @@ public:
 
 	void DrawPrimitiveIndex(UTILS::Vertex* vertex, UTILS::uint* uIndex,
 		int type, int nPrimitiveCount);
+
+	
 protected:
 	//bool initMainWindow(int,int);
 	bool initDevice();

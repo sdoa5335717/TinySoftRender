@@ -73,7 +73,7 @@ int Cull_OBJECT4DV1(TNYMATH::OBJECT4DV1_PTR obj, CAM4DV1_PTR cam, int cull_flags
 			return 1;
 		}
 	}
-
+	return 0;
 }
 
 void Reset_OBJECT4DV1(TNYMATH::OBJECT4DV1_PTR obj)
@@ -100,11 +100,12 @@ void Remove_Backfaces_OBJECT4DV1(TNYMATH::OBJECT4DV1_PTR obj, CAM4DV1_PTR cam)
 	}
 	for (int poly = 0; poly < obj->num_polys; poly++)
 	{
+
 		POLY4DV1_PTR curr_poly = &obj->plist[poly];
-		if (!(curr_poly->state & POLY4DV1_STATE_ACTIVE) ||
-			(curr_poly->state & POLY4DV1_STATE_CLIPPED) ||
-			(curr_poly->state & POLY4DV1_ATTR_2SIDE) ||
-			(curr_poly->state & POLY4DV1_STATE_BACKFACE))
+		if (!(curr_poly->state & POLY4DV1_STATE_ACTIVE) /*||*/
+			/*			(curr_poly->state & POLY4DV1_STATE_CLIPPED) ||
+						(curr_poly->state & POLY4DV1_ATTR_2SIDE) ||
+						(curr_poly->state & POLY4DV1_STATE_BACKFACE)*/)
 		{
 			continue;
 		}

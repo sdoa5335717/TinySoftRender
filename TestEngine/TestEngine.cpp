@@ -6,6 +6,7 @@
 #include "TNYMATH.h"
 #include "CAM4DV1.h"
 #include "TNYScene.h"
+#include "PLXFileLoader.h"
 #define MAX_LOADSTRING 100
 #pragma comment(lib,"TinyEngine")
 
@@ -16,84 +17,21 @@ CAM4DV1 cam; // 相机
 OBJECT4DV1 obj;
 std::unique_ptr<TNYScene> g_scene;
 
+PLXFileLoader plx;
+
 bool Setup()
 {
 	////g_scene->initScene();
 	POINT4D cam_pos = { 0,0,-200,1 };
 	VECTOR4D cam_dir = { 0,0,0,1 };
-
-	//VECTOR4D vscale = { 0.5,0.5,0.5,1 }, vpos = { 0,0,0,1 }, vrot = { 0,0,0,1 };
+	VECTOR4D vscale = { 0.5,0.5,0.5,1 }, vpos = { 0,0,0,1 }, vrot = { 0,0,0,1 };
+	std::string file = "test.plg";
+	plx.Load_OBJECT4DV1_PLG(&obj, const_cast<char*>(file.c_str()), &vscale, &vpos, &vrot);
+	//
 	//RENDERLIST4DV1 rend_list;
 	//
 	obj.id = 0;
 	obj.dir = { 0,0,0 };
-	obj.num_polys = 12;
-	obj.num_vertices = 8;
-	//
-	obj.vlist_local[0].x = -50;
-	obj.vlist_local[0].y = 50;
-	obj.vlist_local[0].z = 50;
-	obj.vlist_local[0].w = 1;
-	//
-	obj.vlist_local[1].x = 50;
-	obj.vlist_local[1].y = 50;
-	obj.vlist_local[1].z = 50;
-	obj.vlist_local[1].w = 1;
-	//
-	obj.vlist_local[2].x = 50;
-	obj.vlist_local[2].y = -50;
-	obj.vlist_local[2].z = 50;
-	obj.vlist_local[2].w = 1;
-
-	obj.vlist_local[3].x = -50;
-	obj.vlist_local[3].y = -50;
-	obj.vlist_local[3].z = 50;
-	obj.vlist_local[3].w = 1;
-	////obj.vlist_local[0].
-
-	obj.vlist_local[4].x = -50;
-	obj.vlist_local[4].y = 50;
-	obj.vlist_local[4].z = -50;
-	obj.vlist_local[4].w = 1;
-	//
-	obj.vlist_local[5].x = 50;
-	obj.vlist_local[5].y = 50;
-	obj.vlist_local[5].z = -50;
-	obj.vlist_local[5].w = 1;
-	//
-	obj.vlist_local[6].x = 50;
-	obj.vlist_local[6].y = -50;
-	obj.vlist_local[6].z = -50;
-	obj.vlist_local[6].w = 1;
-
-	obj.vlist_local[7].x = -50;
-	obj.vlist_local[7].y = -50;
-	obj.vlist_local[7].z = -50;
-	obj.vlist_local[7].w = 1;
-
-
-	obj.vlist_index[0] = 0, obj.vlist_index[1] = 1, obj.vlist_index[2] = 2;
-	obj.vlist_index[3] = 0, obj.vlist_index[4] = 2, obj.vlist_index[5] = 3;
-
-	obj.vlist_index[6] = 0, obj.vlist_index[7] = 1, obj.vlist_index[8] = 5;
-	obj.vlist_index[9] = 0, obj.vlist_index[10] = 5, obj.vlist_index[11] = 4;
-//
-	obj.vlist_index[12] = 0, obj.vlist_index[13] = 4, obj.vlist_index[14] = 7;
-	obj.vlist_index[15] = 0, obj.vlist_index[16] = 7, obj.vlist_index[17] = 3;
-//
-	obj.vlist_index[18] = 6, obj.vlist_index[19] = 7, obj.vlist_index[20] = 4;
-	obj.vlist_index[21] = 6, obj.vlist_index[22] = 4, obj.vlist_index[23] = 5;
-//
-	obj.vlist_index[24] = 6, obj.vlist_index[25] = 5, obj.vlist_index[26] = 1;
-	obj.vlist_index[27] = 6, obj.vlist_index[28] = 1, obj.vlist_index[29] = 2;
-//
-	obj.vlist_index[30] = 6, obj.vlist_index[31] = 7, obj.vlist_index[32] = 3;
-	obj.vlist_index[33] = 6, obj.vlist_index[34] = 3, obj.vlist_index[35] = 2;
-
-	//g_scene->AddObject(&obj);
-
-	//g_scene->SetCamera(0, &cam_pos, &cam_dir, NULL, 50.0, 500.0, 90, 
-	//	g_scene->GetWidth(), g_scene->GetHeight());
 
 	cam.Init_CAM4DV1(0, &cam_pos, &cam_dir, NULL, 50.0, 500.0, 90, g_device->m_width, g_device->m_heigth);
 
@@ -153,12 +91,14 @@ bool Display(float timeDelta)
 		//Reset_RENDERLIST4DV1(&rend_list);
 		// 世界坐标到相机坐标
 		World_To_Camera_OJECT4DV1(&cam, &obj);
+
+		Remove_Backfaces_OBJECT4DV1(&obj, &cam);
 		// 相机坐标到透视坐标变换
 		Camera_To_Perspective_OBJECT4DV1(&obj, &cam);
 		// 屏幕变换
 		Perspective_To_Screen_OBJECT4DV1(&obj, &cam);
-
-		g_device->DrawPrimitiveIndex(obj.vlist_screen, obj.vlist_index, TNY_TRANGLELIST, 12);
+		g_device->DrawObject(&obj);
+		//g_device->DrawPrimitiveIndex(obj.vlist_screen, obj.vlist_index, TNY_TRANGLELIST, 12);
 
 		g_device->present();
 	}

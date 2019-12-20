@@ -98,8 +98,8 @@ int PLXFileLoader::Load_OBJECT4DV1_PLG(TNYMATH::OBJECT4DV1_PTR obj, char* filena
 			int red = ((poly_surface_desc & 0x0f00) >> 8);
 			int green = ((poly_surface_desc & 0x00f0) >> 4);
 			int blue = (poly_surface_desc & 0x000f);
-
-			//obj->plist[poly].color = RGB16Bit(red * 16, green * 16, blue * 16);
+			
+			obj->plist[poly].color = 0xffff0000;
 		}
 		else
 		{

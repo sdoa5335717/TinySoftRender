@@ -110,6 +110,12 @@ namespace UTILS
 	class Vertex {
 
 	public:
+		Vertex() {};
+		Vertex(const int _x, const int _y, unsigned int color)
+		:x(_x),y(_y),_color(color)
+		{
+
+		}
 		unsigned int x = 0;
 		unsigned int y = 0;
 
