@@ -208,6 +208,7 @@ void CAM4DV1::Build_CAM4DV1_Matrix_UVN(int mode)
 		target.z = sin_phi * cos_theta;
 	}
 	// n = <目标位置-观察点位置>
+	//VECTOR4D_COPY(&n, &dir);
 	VECTOR4D_Build(&pos, &target, &n);
 	VECTOR4D_INITXYZ(&v, 0, 1, 0);
 	VECTOR4D_Cross(&v, &n, &u);
@@ -219,7 +220,7 @@ void CAM4DV1::Build_CAM4DV1_Matrix_UVN(int mode)
 	VECTOR4D_Normalize(&n);
 
 	Mat_Init_4x4(&mt_uvn, u.x, v.x, n.x, 0,
-		u.y, v.y, n.z, 0,
+		u.y, v.y, n.y, 0,
 		u.z, v.z, n.z, 0,
 		0, 0, 0, 1);
 
