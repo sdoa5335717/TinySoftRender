@@ -1,5 +1,6 @@
 #include "global.h"
 #include "CAM4DV1.h"
+#include <assert.h>
 using namespace TNYMATH;
 void World_To_Camera_RENDERLIST4DV1(TNYMATH::RENDERLIST4DV1_PTR rend_list, CAM4DV1_PTR cam)
 {
@@ -119,7 +120,9 @@ void Remove_Backfaces_OBJECT4DV1(TNYMATH::OBJECT4DV1_PTR obj, CAM4DV1_PTR cam)
 		VECTOR4D_Build(&obj->vlist_trans[vindex_0], &obj->vlist_trans[vindex_2], &v);
 
 		VECTOR4D_Cross(&u, &v, &n);
-
+		//n.x = -n.x;
+		//n.y = -n.y;
+		//n.z = -n.z;
 		VECTOR4D view;
 		VECTOR4D_Build(&obj->vlist_trans[vindex_0], &cam->pos, &view);
 
@@ -165,9 +168,11 @@ void Camera_To_Perspective_OBJECT4DV1(TNYMATH::OBJECT4DV1_PTR obj, CAM4DV1_PTR c
 	for (int vertex =0;vertex<obj->num_vertices;vertex++)
 	{
 		float z = obj->vlist_trans[vertex].z;
-
 		obj->vlist_trans[vertex].x = cam->view_dist*obj->vlist_trans[vertex].x / z;
 		obj->vlist_trans[vertex].y = cam->view_dist*obj->vlist_trans[vertex].y / z;
+
+		assert(obj->vlist_trans[vertex].x >= -1.0f && obj->vlist_trans[vertex].x <= 1.0f);
+		assert(obj->vlist_trans[vertex].y >= -1.0f && obj->vlist_trans[vertex].y <= 1.0f);
 	}
 }
 
@@ -198,6 +203,7 @@ void Perspective_To_Screen_OBJECT4DV1(TNYMATH::OBJECT4DV1_PTR obj, CAM4DV1_PTR c
 
 		obj->vlist_screen[vertex].x = obj->vlist_trans[vertex].x;
 		obj->vlist_screen[vertex].y = obj->vlist_trans[vertex].y;
+
 		obj->vlist_screen[vertex]._color = 0xffff0000;
 	}
 }

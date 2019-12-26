@@ -186,31 +186,44 @@ void CAM4DV1::Build_CAM4DV1_Matrix_UVN(int mode)
 {
 	MATRIX4X4 mt_inv, mt_uvn, mtmp;
 
-	// 1 创建逆平移矩阵
-	Mat_Init_4x4(&mt_inv, 1, 0, 0, 0,
-		0, 1, 0, 0,
-		0, 0, 1, 0,
-		-pos.x, -pos.y, -pos.z, 1);
+	VECTOR4D_INITXYZ(&v, 0, 1, 0);
 
 	if (mode == UVN_MODE_SPHERICAL) {
 		// 使用球面坐标模式
-		float phi = dir.x;
+		float phi = PI-dir.x;
 		float theta = dir.y; // 方位角
-
+		float length = dir.z;
+		if (phi < 0.1f) {
+			phi = 0.1f;
+			//VECTOR4D_INITXYZ(&v, 0, 0, 1);
+		}
+		if (phi > PI-0.1f) {
+			phi = PI -0.1f;
+			//VECTOR4D_INITXYZ(&v, 0, 0, -1);
+		}
 		float sin_phi = Fast_Sin(phi);
 		float cos_phi = Fast_Cos(phi);
 
 		float sin_theta = Fast_Sin(theta);
 		float cos_theta = Fast_Cos(theta);
 
-		target.x = -1 * sin_phi*sin_theta;
-		target.y = 1 * cos_phi;
-		target.z = sin_phi * cos_theta;
+		//target.x = -1 * sin_phi*sin_theta;
+		//target.y = 1 * cos_phi;
+		//target.z = sin_phi * cos_theta;
+
+		pos.x = length * sin_phi*cos_theta;
+		pos.y = length * cos_phi;
+		pos.z = length*sin_phi * sin_theta;
 	}
+	// 1 创建逆平移矩阵
+	Mat_Init_4x4(&mt_inv, 1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		-pos.x, -pos.y, -pos.z, 1);
+
 	// n = <目标位置-观察点位置>
 	//VECTOR4D_COPY(&n, &dir);
-	VECTOR4D_Build(&pos, &target, &n);
-	VECTOR4D_INITXYZ(&v, 0, 1, 0);
+	VECTOR4D_Build(&pos, &target, &n);	
 	VECTOR4D_Cross(&v, &n, &u);
 	VECTOR4D_Cross(&n, &u, &v);
 
@@ -225,4 +238,49 @@ void CAM4DV1::Build_CAM4DV1_Matrix_UVN(int mode)
 		0, 0, 0, 1);
 
 	Mat_Mul_4x4(&mt_inv, &mt_uvn, &mcam);
+}
+
+void CAM4DV1::Camera_move(int moveType, int direction, float delta)
+{
+	// 相机平移
+	//if (moveType == CAM_MOVE_XYZ)
+	//{
+	//	if (direction == CAM_MOVE_UP) 
+	//	{
+	//		pos.y += delta;
+	//	}
+	//	else if (direction == CAM_MOVE_DOWN)
+	//	{
+	//		pos.y -= delta;
+	//	}
+	//	else if (direction == CAM_MOVE_LEFT)
+	//	{
+	//		pos.x -= delta;
+	//	}
+	//	else if (direction == CAM_MOVE_RIGHT)
+	//	{
+	//		pos.x += delta;
+	//	}
+	//}
+	// 球面移动
+	if (moveType == CAM_MOVE_SPHERICAL)
+	{
+		if (direction == CAM_MOVE_UP)
+		{
+			dir.x += delta;
+		}
+		else if (direction == CAM_MOVE_DOWN)
+		{
+			dir.x -= delta;
+		}
+		else if (direction == CAM_MOVE_LEFT)
+		{
+			dir.y += delta;
+		}
+		else if (direction == CAM_MOVE_RIGHT)
+		{
+			dir.y -= delta;
+		}
+	}
+	//Build_CAM4DV1_Matrix_Euler(CAM_ROT_SEQ_ZXY);
 }

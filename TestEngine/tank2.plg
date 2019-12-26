@@ -1,0 +1,141 @@
+# begin plg/plx file
+
+# define PLX_COLOR_MODE_RGB_FLAG     0x8000   // this poly uses RGB color
+# define PLX_COLOR_MODE_INDEXED_FLAG 0x0000   // this poly uses an indexed 8-bit color 
+# define PLX_2SIDED_FLAG              0x1000   // this poly is double sided
+# define PLX_1SIDED_FLAG              0x0000   // this poly is single sided
+# define PLX_SHADE_MODE_PURE_FLAG      0x0000  // this poly is a constant color
+# define PLX_SHADE_MODE_CONSTANT_FLAG  0x0000  // alias
+# define PLX_SHADE_MODE_FLAT_FLAG      0x2000  // this poly uses flat shading
+# define PLX_SHADE_MODE_GOURAUD_FLAG   0x4000  // this poly used gouraud shading
+# define PLX_SHADE_MODE_PHONG_FLAG     0x6000  // this poly uses phong shading
+# define PLX_SHADE_MODE_FASTPHONG_FLAG 0x6000  // this poly uses phong shading (alias)
+
+# name num_verts num_polys
+
+slider 40 60
+
+#vertex list
+
+10 2 15
+-10 2 15
+-10 -2 15
+10 -2 15
+10 2 -15
+-10 2 -15
+-10 -2 -15
+10 -2 -15
+#7
+#8
+10 -2 -15
+6 -2 -15
+6 -6 -12
+10 -6 -12
+
+10 -2 15
+6 -2 15
+6 -6 12
+10 -6 12
+##
+-10 -2 -15
+-6 -2 -15
+-6 -6 -12
+-10 -6 -12
+
+-10 -2 15
+-6 -2 15
+-6 -6 12
+-10 -6 12
+#23
+#24
+10 2 10
+-10 2 10
+-10 15 10
+10 15 10
+
+10 2 -10
+-10 2 -10
+-10 15 -10
+10 15 -10
+#31
+#32
+1 8 10
+-1 8 10
+-1 10 10
+1 10 10
+
+1 8 30
+-1 8 30
+-1 10 30
+1 10 30
+#39
+#end vertex list
+
+#poly list
+#µ×ÅÌ
+0xdfff 3 2 1 0
+0xdfff 3 2 0 3
+0xdfff 3 0 1 5
+0xdfff 3 0 5 4
+0xdfff 3 0 4 7
+0xdfff 3 0 7 3
+0xdfff 3 6 5 1
+0xdfff 3 6 1 2
+0xdfff 3 6 2 3
+0xdfff 3 6 3 7
+0xdfff 3 6 4 5
+0xdfff 3 6 7 4
+#ÂÄ´ø
+0xdfff 3 8 9 10
+0xdfff 3 8 10 11
+0xdfff 3 8 13 9
+0xdfff 3 8 12 13
+0xdfff 3 8 11 15
+0xdfff 3 8 15 12
+0xdfff 3 14 13 12
+0xdfff 3 14 12 15
+0xdfff 3 14 9 13
+0xdfff 3 14 10 9
+0xdfff 3 14 15 11
+0xdfff 3 14 11 10
+
+0xdfff 3 16 17 18
+0xdfff 3 16 18 19
+0xdfff 3 16 20 21
+0xdfff 3 16 21 17
+0xdfff 3 16 19 23
+0xdfff 3 16 23 20
+0xdfff 3 22 21 20
+0xdfff 3 22 20 23
+0xdfff 3 22 18 17
+0xdfff 3 22 17 21
+0xdfff 3 22 23 19
+0xdfff 3 22 19 18
+#ÅÚËþ
+0xdfff 3 24 25 26
+0xdfff 3 24 26 27
+0xdfff 3 24 27 31
+0xdfff 3 24 31 28
+0xdfff 3 24 28 29
+0xdfff 3 24 29 25
+0xdfff 3 30 29 28
+0xdfff 3 30 28 31
+0xdfff 3 30 26 25
+0xdfff 3 30 25 29
+0xdfff 3 30 31 27
+0xdfff 3 30 27 26
+#ÅÚ¹Ü
+0xdfff 3 32 34 33
+0xdfff 3 32 35 34
+0xdfff 3 32 36 39
+0xdfff 3 32 39 35
+0xdfff 3 32 37 36
+0xdfff 3 32 33 37
+0xdfff 3 38 39 36
+0xdfff 3 38 36 37
+0xdfff 3 38 35 39
+0xdfff 3 38 34 35
+0xdfff 3 38 37 33
+0xdfff 3 38 33 34
+
+#end poly list

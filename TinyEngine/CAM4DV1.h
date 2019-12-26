@@ -37,50 +37,7 @@ public:
 	void Build_CAM4DV1_Matrix_Euler(int cam_rot_seq);
 	void Build_CAM4DV1_Matrix_UVN(int mode);
 	// 相机移动
-	void Camera_move(int moveType, int direction, float delta) 
-	{
-		// 相机平移
-		//if (moveType == CAM_MOVE_XYZ)
-		//{
-		//	if (direction == CAM_MOVE_UP) 
-		//	{
-		//		pos.y += delta;
-		//	}
-		//	else if (direction == CAM_MOVE_DOWN)
-		//	{
-		//		pos.y -= delta;
-		//	}
-		//	else if (direction == CAM_MOVE_LEFT)
-		//	{
-		//		pos.x -= delta;
-		//	}
-		//	else if (direction == CAM_MOVE_RIGHT)
-		//	{
-		//		pos.x += delta;
-		//	}
-		//}
-		// 球面移动
-		if (moveType == CAM_MOVE_SPHERICAL)
-		{
-			if (direction == CAM_MOVE_UP)
-			{
-				dir.x += delta;
-			}
-			else if (direction == CAM_MOVE_DOWN)
-			{
-				dir.x -= delta;
-			}
-			else if (direction == CAM_MOVE_LEFT)
-			{
-				dir.y += delta;
-			}
-			else if (direction == CAM_MOVE_RIGHT)
-			{
-				dir.y -= delta;
-			}
-		}
-		//Build_CAM4DV1_Matrix_Euler(CAM_ROT_SEQ_ZXY);
-	}
+	void Camera_move(int moveType, int direction, float delta);
 public:
 	int state;
 	int attr;
