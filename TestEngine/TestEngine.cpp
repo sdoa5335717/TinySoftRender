@@ -7,9 +7,11 @@
 #include "CAM4DV1.h"
 #include "TNYScene.h"
 #include "PLXFileLoader.h"
+#include <vector>
 #define MAX_LOADSTRING 100
 #pragma comment(lib,"TinyEngine")
 
+using namespace std;
 using namespace TNYMATH;
 // 全局变量:
 std::unique_ptr<CoreEngine> g_device = nullptr;
@@ -22,23 +24,53 @@ float g_cam_dist = 200;	// 相机到物体的距离，滚轮控制
 //
 OBJECT4DV1 obj;
 std::unique_ptr<TNYScene> g_scene;
-
+std::vector<OBJECT4DV1> g_objlist;
 PLXFileLoader plx;
 
 #define KEY_DOWN(vk_code) ((GetAsyncKeyState(vk_code) & 0x8000) ? 1 : 0)
 #define KEY_UP(vk_code)   ((GetAsyncKeyState(vk_code) & 0x8000) ? 0 : 1)
 
+void MoveTank();
 bool Setup()
 {
 	////g_scene->initScene();
+	int towerNum = 20;
+	g_objlist.resize(towerNum + 2);
+
 	POINT4D cam_pos = { 0,50,-50,1 };
-	VECTOR4D cam_dir = { PI_DIV_4,PI_DIV_2,-50,1 };
+	VECTOR4D cam_dir = { PI_DIV_4,PI_DIV_2,-150,1 };
 	VECTOR4D vscale = { 0.5,0.5,0.5,1 }, vpos = { 0,0,0,1 }, vrot = { 0,0,0,1 };
-	std::string file = "cube1.plg";
-	if (!plx.Load_OBJECT4DV1_PLG(&obj, const_cast<char*>(file.c_str()), &vscale, &vpos, &vrot))
+
+	std::string file = "tank2.plg";
+	if (!plx.Load_OBJECT4DV1_PLG(&g_objlist[0], const_cast<char*>(file.c_str()), &vscale, &vpos, &vrot))
 	{
 		return false;
 	}
+	g_objlist[0].dir.z = 1.0f;
+
+	file = "tower1.plg";
+
+
+	for (int i=1; i<towerNum;i++)
+	{
+		if (!plx.Load_OBJECT4DV1_PLG(&g_objlist[i], const_cast<char*>(file.c_str()), &vscale, &vpos, &vrot))
+		{
+			return false;
+		}
+		// 设置位置
+		g_objlist[i].world_pos.x = RAND_RANGE(-300, 300);
+		g_objlist[i].world_pos.y = 0;
+		g_objlist[i].world_pos.z = RAND_RANGE(-500, 500);
+		//char temp[64] = {};
+		//sprintf(temp, "x:%.2f, y:%.2f, z:%.2f\n", g_objlist[i].world_pos.x, g_objlist[i].world_pos.y, g_objlist[i].world_pos.z);
+		//OutputDebugStringA(temp);
+	}
+
+	//file = "marker1.plg";
+	//if (!plx.Load_OBJECT4DV1_PLG(&g_objlist[21], const_cast<char*>(file.c_str()), &vscale, &vpos, &vrot))
+	//{
+	//	return false;
+	//}
 	//
 	//RENDERLIST4DV1 rend_list;
 	//
@@ -54,7 +86,69 @@ void Cleanup()
 	// Nothing to cleanup in this sample.
 	//ReleaseDevice(g_device);
 }
+void MoveTank()
+{
+	MATRIX4X4 my_inv;
+	VECTOR4D_Normalize(&g_objlist[0].dir);
 
+	if (KEY_DOWN('W'))
+	{
+		g_objlist[0].world_pos.x += 0.01*g_objlist[0].dir.x;
+		g_objlist[0].world_pos.y += 0.01*g_objlist[0].dir.y;
+		g_objlist[0].world_pos.z += 0.01*g_objlist[0].dir.z;
+	}
+	else if (KEY_DOWN('S'))
+	{
+		g_objlist[0].world_pos.x -= 0.01*g_objlist[0].dir.x;
+		g_objlist[0].world_pos.y -= 0.01*g_objlist[0].dir.y;
+		g_objlist[0].world_pos.z -= 0.01*g_objlist[0].dir.z;
+	}
+	else if (KEY_DOWN('A'))
+	{
+		float theta_y = -0.01;
+
+		float cos_theta = Fast_Cos(theta_y);
+		float sin_theta = Fast_Sin(theta_y);
+		//MATRIX4X4 my_inv;
+		Mat_Init_4x4(&my_inv, cos_theta, 0, -sin_theta, 0,
+			0, 1, 0, 0,
+			sin_theta, 0, cos_theta, 0,
+			0, 0, 0, 1);
+
+		Mat_Mul_VECTOR4D_4x4(&g_objlist[0].dir, &my_inv, &g_objlist[0].dir);
+
+		for (int i = 0; i < g_objlist[0].num_vertices; i++)
+		{
+			VECTOR4D pResult;
+			Mat_Mul_VECTOR4D_4x4(&g_objlist[0].vlist_local[i], &my_inv, &pResult);
+			VECTOR4D_COPY(&g_objlist[0].vlist_local[i], &pResult);
+		}
+		// 相机旋转
+		//Mat_Mul_4x4(&cam.mcam, &my_inv, &cam.mcam);
+
+	}
+	else if (KEY_DOWN('D'))
+	{
+		float theta_y = 0.01;
+
+		float cos_theta = Fast_Cos(theta_y);
+		float sin_theta = Fast_Sin(theta_y);
+		//MATRIX4X4 my_inv;
+		Mat_Init_4x4(&my_inv, cos_theta, 0, -sin_theta, 0,
+			0, 1, 0, 0,
+			sin_theta, 0, cos_theta, 0,
+			0, 0, 0, 1);
+		Mat_Mul_VECTOR4D_4x4(&g_objlist[0].dir, &my_inv, &g_objlist[0].dir);
+
+		for (int i = 0; i < g_objlist[0].num_vertices; i++)
+		{
+			VECTOR4D pResult;
+			Mat_Mul_VECTOR4D_4x4(&g_objlist[0].vlist_local[i], &my_inv, &pResult);
+			VECTOR4D_COPY(&g_objlist[0].vlist_local[i], &pResult);
+		}
+		//Mat_Mul_4x4(&cam.mcam, &my_inv, &cam.mcam);
+	}
+}
 bool Display(float timeDelta)
 {
 	static float intervalTime = 0;
@@ -66,13 +160,6 @@ bool Display(float timeDelta)
 		Sleep(10);
 		g_device->Clear(0xff000000);
 
-		Reset_OBJECT4DV1(&obj);
-		//timeval
-		//cam.Build_CAM4DV1_Matrix_Euler(CAM4DV1::CAM_ROT_SEQ_ZXY);
-		//float cam_thetay = 0.0f;
-		
-		MATRIX4X4 my_inv;
-		MATRIX4X4 mx_inv;
 		if (KEY_DOWN(VK_LEFT)) {
 			// 相机绕Y轴旋转
 			cam.Camera_move(CAM4DV1::CAM_MOVE_SPHERICAL, CAM4DV1::CAM_MOVE_LEFT, 0.01);
@@ -80,82 +167,105 @@ bool Display(float timeDelta)
 		else if (KEY_DOWN(VK_RIGHT))
 		{
 			cam.Camera_move(CAM4DV1::CAM_MOVE_SPHERICAL, CAM4DV1::CAM_MOVE_RIGHT, 0.01);
-			//theta_y -= 0.01;
-			//if (theta_y < 0) {
-			//	theta_y = 0.0;
-			//}
 		}
 		else if (KEY_DOWN(VK_UP))
 		{
 			cam.Camera_move(CAM4DV1::CAM_MOVE_SPHERICAL, CAM4DV1::CAM_MOVE_UP, 0.01);
-			//theta_x += 0.01;
 		}
 		else if (KEY_DOWN(VK_DOWN))
 		{
 			cam.Camera_move(CAM4DV1::CAM_MOVE_SPHERICAL, CAM4DV1::CAM_MOVE_DOWN, 0.01);
-			//theta_x -= 0.01;
 		}
+
+
 		cam.Build_CAM4DV1_Matrix_UVN(CAM4DV1::UVN_MODE_SPHERICAL);
-		//cam.Build_CAM4DV1_Matrix_Euler(CAM4DV1::CAM_ROT_SEQ_XYZ);
-		/*	float cos_theta = Fast_Cos(theta_y);
-			float sin_theta = Fast_Sin(theta_y);
-			float cos_theta_x = Fast_Cos(theta_x);
-			float sin_theta_x = Fast_Sin(theta_x);
-			Mat_Init_4x4(&my_inv, cos_theta, 0, -sin_theta, 0,
-				0, 1, 0, 0,
-				sin_theta, 0, cos_theta, 0,
-				0, 0, 0, 1);
+		// draw tank		
+		//// 绘制地形
+		for (int i=0;i<20;i++)
+		{
+			Reset_OBJECT4DV1(&g_objlist[i]);
 
-			Mat_Init_4x4(&mx_inv, 1, 0, 0, 0,
-				0, cos_theta_x, -sin_theta_x, 0,
-				0, sin_theta_x, cos_theta_x, 0,
-				0, 0, 0, 1);
+			MoveTank();
 
-			MATRIX4X4 m_inv;
-			Mat_Mul_4x4(&my_inv,&mx_inv,&m_inv);
+			Model_To_World_OBJECT4DV1(&g_objlist[i]);
+			if (!Cull_OBJECT4DV1(&g_objlist[i], &cam, CULL_OBJECT_XYZ_PLANES))
+			{
+				//Remove_Backfaces_OBJECT4DV1(&g_objlist[i], &cam, true);
 
-			Mat_Mul_4x4(&cam.mcam, &m_inv, &cam.mcam);*/
-		// 局部坐标转世界坐标
-		Model_To_World_OBJECT4DV1(&obj);
-		// 模型旋转
-		//theta_y += 0.01;
-		//if (theta_y > PI2) {
-		//	theta_y = 0.0;
-		//}
-		////if (theta_y > PI2) {
-		////	theta_y = -theta_y;
-		////}
-		//float cos_theta = Fast_Cos(theta_y);
-		//float sin_theta = Fast_Sin(theta_y);
-		////MATRIX4X4 my_inv;
-		//Mat_Init_4x4(&my_inv, cos_theta, 0, -sin_theta, 0,
-		//	0, 1, 0, 0,
-		//	sin_theta, 0, cos_theta, 0,
-		//	0, 0, 0, 1);
+				World_To_Camera_OJECT4DV1(&cam, &g_objlist[i]);
 
+				if (Camera_To_Perspective_OBJECT4DV1(&g_objlist[i], &cam))
+				{
+					// 屏幕变换
+					Perspective_To_Screen_OBJECT4DV1(&g_objlist[i], &cam);
+					g_device->DrawObject(&g_objlist[i]);
+				}
+				
+			}
+			
+		}
+		//Reset_OBJECT4DV1(&obj);
+		////timeval
+		////cam.Build_CAM4DV1_Matrix_Euler(CAM4DV1::CAM_ROT_SEQ_ZXY);
+		////float cam_thetay = 0.0f;
 		//
 
-		//for (int i = 0; i < obj.num_vertices; i++)
-		//{
-		//	VECTOR4D pResult;
-		//	Mat_Mul_VECTOR4D_4x4(&obj.vlist_trans[i], &my_inv, &pResult);
-		//	VECTOR4D_COPY(&obj.vlist_trans[i], &pResult);
-		//}
-		
-		//g_scene->DrawScene();
-		//// 创建相机变换矩阵
-		//cam.Build_CAM4DV1_Matrix_UVN(CAM4DV1::UVN_MODE_SIMPLE);
-		
-		//Reset_RENDERLIST4DV1(&rend_list);
-		// 世界坐标到相机坐标
-		World_To_Camera_OJECT4DV1(&cam, &obj);
+		////MATRIX4X4 my_inv;
+		////MATRIX4X4 mx_inv;
+		////if (KEY_DOWN(VK_LEFT)) {
+		////	// 相机绕Y轴旋转
+		////	cam.Camera_move(CAM4DV1::CAM_MOVE_SPHERICAL, CAM4DV1::CAM_MOVE_LEFT, 0.01);
+		////}
+		////else if (KEY_DOWN(VK_RIGHT))
+		////{
+		////	cam.Camera_move(CAM4DV1::CAM_MOVE_SPHERICAL, CAM4DV1::CAM_MOVE_RIGHT, 0.01);
+		////}
+		////else if (KEY_DOWN(VK_UP))
+		////{
+		////	cam.Camera_move(CAM4DV1::CAM_MOVE_SPHERICAL, CAM4DV1::CAM_MOVE_UP, 0.01);
+		////}
+		////else if (KEY_DOWN(VK_DOWN))
+		////{
+		////	cam.Camera_move(CAM4DV1::CAM_MOVE_SPHERICAL, CAM4DV1::CAM_MOVE_DOWN, 0.01);
+		////}
+		//cam.Build_CAM4DV1_Matrix_UVN(CAM4DV1::UVN_MODE_SPHERICAL);
+		////cam.Build_CAM4DV1_Matrix_Euler(CAM4DV1::CAM_ROT_SEQ_XYZ);
+		///*	float cos_theta = Fast_Cos(theta_y);
+		//	float sin_theta = Fast_Sin(theta_y);
+		//	float cos_theta_x = Fast_Cos(theta_x);
+		//	float sin_theta_x = Fast_Sin(theta_x);
+		//	Mat_Init_4x4(&my_inv, cos_theta, 0, -sin_theta, 0,
+		//		0, 1, 0, 0,
+		//		sin_theta, 0, cos_theta, 0,
+		//		0, 0, 0, 1);
 
-		Remove_Backfaces_OBJECT4DV1(&obj, &cam);
-		// 相机坐标到透视坐标变换
-		Camera_To_Perspective_OBJECT4DV1(&obj, &cam);
-		// 屏幕变换
-		Perspective_To_Screen_OBJECT4DV1(&obj, &cam);
-		g_device->DrawObject(&obj);
+		//	Mat_Init_4x4(&mx_inv, 1, 0, 0, 0,
+		//		0, cos_theta_x, -sin_theta_x, 0,
+		//		0, sin_theta_x, cos_theta_x, 0,
+		//		0, 0, 0, 1);
+
+		//	MATRIX4X4 m_inv;
+		//	Mat_Mul_4x4(&my_inv,&mx_inv,&m_inv);
+
+		//	Mat_Mul_4x4(&cam.mcam, &m_inv, &cam.mcam);*/
+		//// 局部坐标转世界坐标
+		//Model_To_World_OBJECT4DV1(&obj);
+		//// 模型旋转
+
+		//
+		////g_scene->DrawScene();
+		////// 创建相机变换矩阵
+		////cam.Build_CAM4DV1_Matrix_UVN(CAM4DV1::UVN_MODE_SIMPLE);
+		//
+		////Reset_RENDERLIST4DV1(&rend_list);
+		//Remove_Backfaces_OBJECT4DV1(&obj, &cam, true);
+		//// 世界坐标到相机坐标
+		//World_To_Camera_OJECT4DV1(&cam, &obj);
+		//// 相机坐标到透视坐标变换
+		//Camera_To_Perspective_OBJECT4DV1(&obj, &cam);
+		//// 屏幕变换
+		//Perspective_To_Screen_OBJECT4DV1(&obj, &cam);
+		//g_device->DrawObject(&obj);
 		//g_device->DrawPrimitiveIndex(obj.vlist_screen, obj.vlist_index, TNY_TRANGLELIST, 12);
 
 		g_device->present();

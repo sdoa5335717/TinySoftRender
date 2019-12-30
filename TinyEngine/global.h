@@ -26,11 +26,11 @@ int Cull_OBJECT4DV1(TNYMATH::OBJECT4DV1_PTR obj, CAM4DV1_PTR cam, int cull_floag
 
 void Reset_OBJECT4DV1(TNYMATH::OBJECT4DV1_PTR obj);
 
-void Remove_Backfaces_OBJECT4DV1(TNYMATH::OBJECT4DV1_PTR obj, CAM4DV1_PTR cam);
+void Remove_Backfaces_OBJECT4DV1(TNYMATH::OBJECT4DV1_PTR obj, CAM4DV1_PTR cam,bool left = false);
 
 void Remove_Backfaces_RENDERLIST4DV1(TNYMATH::RENDERLIST4DV1_PTR rend_list, CAM4DV1_PTR cam);
 
-void Camera_To_Perspective_OBJECT4DV1(TNYMATH::OBJECT4DV1_PTR obj, CAM4DV1_PTR cam);
+bool Camera_To_Perspective_OBJECT4DV1(TNYMATH::OBJECT4DV1_PTR obj, CAM4DV1_PTR cam);
 
 void Build_Camera_To_Perspective_MATRIX4X4(CAM4DV1_PTR cam, TNYMATH::MATRIX4X4_PTR m);
 

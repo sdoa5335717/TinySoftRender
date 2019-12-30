@@ -30,7 +30,7 @@
 
 #define DEG_TO_RAD(ang) ((ang)*PI/180.0f)
 #define RAD_TO_DEG(rad) ((rad)*180.0f/PI)
-#define RAND_RANGE(x, y) ( x + (rand()%(y-x+1)))
+#define RAND_RANGE(x, y) ( (x) + (rand()%((y)-(x)+1)))
 
 #define SET_BIT(word,bit_flag)   ((word)=((word) | (bit_flag)))
 #define RESET_BIT(word,bit_flag) ((word)=((word) & (~bit_flag)))

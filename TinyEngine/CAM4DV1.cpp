@@ -201,6 +201,7 @@ void CAM4DV1::Build_CAM4DV1_Matrix_UVN(int mode)
 			phi = PI -0.1f;
 			//VECTOR4D_INITXYZ(&v, 0, 0, -1);
 		}
+
 		float sin_phi = Fast_Sin(phi);
 		float cos_phi = Fast_Cos(phi);
 
@@ -211,7 +212,7 @@ void CAM4DV1::Build_CAM4DV1_Matrix_UVN(int mode)
 		//target.y = 1 * cos_phi;
 		//target.z = sin_phi * cos_theta;
 
-		pos.x = length * sin_phi*cos_theta;
+		pos.x = -length * sin_phi*cos_theta;
 		pos.y = length * cos_phi;
 		pos.z = length*sin_phi * sin_theta;
 	}
